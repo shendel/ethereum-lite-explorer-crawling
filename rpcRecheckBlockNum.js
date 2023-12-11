@@ -31,11 +31,9 @@ const db_checkBlockNum = async(latestBlock) => {
       let parse = JSON.parse(string)
       let checkBlockNum = parse[0].RESULT
 
-      if(checkBlockNum == '0'){
-        console.log("missed block data", number)
+      if(checkBlockNum == '0') {
+        console.log("[Info] missed block data", number)
         rpcGetLatestData(number)
-      } else {
-        console.log("block data already existed", number)
       }
     })
   }

@@ -34,8 +34,6 @@ const db_checkBlockNum = async(latestBlock) => {
 
     if(checkBlockNum == '0'){
       rpcGetLatestData(blockNumber)
-    } else {
-      console.log("block data already existed")
     }
   })
 }

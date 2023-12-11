@@ -9,18 +9,17 @@ const eth_getBlockByNumber = async(blockNumber) => {
   let hex = blockNumber.toString(16)
 
   const response = await etherApi({
-      "jsonrpc":"2.0",
-      "method":"eth_getBlockByNumber",
-      "params":["0x" + hex, true],
-      "id":9
+    "jsonrpc":"2.0",
+    "method":"eth_getBlockByNumber",
+    "params":["0x" + hex, true],
+    "id":9
   })
 
   if(response.data.result === null){
-      setTimeout(()=>eth_getBlockByNumber(blockNumber),1000)
+    setTimeout(()=>eth_getBlockByNumber(blockNumber),1000)
   } else {
-    console.log('>> response', response)
-      let blockTxArr = response.data.result.transactions
-      db_insertBlockData(response.data.result, blockTxArr)
+    let blockTxArr = response.data.result.transactions
+    db_insertBlockData(response.data.result, blockTxArr)
   }
 }
 
@@ -69,9 +68,7 @@ const db_insertTxsData = async(blockTxArr, time_stamp) => {
         const contractDataInsert = "INSERT INTO contract_data (blockNumber, contractAddress) VALUES (?, ?);"
         db.query(contractDataInsert, [blockNumber, toAddress], (err, result) => {
           if(err) {
-            //console.log("error : ", err)
-          } else {
-            //console.log("result : ", result)
+            console.log("[DB Fail] ", err.message)
           }    
         })
 
@@ -81,9 +78,10 @@ const db_insertTxsData = async(blockTxArr, time_stamp) => {
       
       const txHashInsert = "INSERT INTO transaction_data (txHash, blockNumber, blockNumberHex, time_stamp ,fromAddress, toAddress, value) VALUES (?, ?, ?, ?, ?, ?, ?);"
       db.query(txHashInsert, [txHash, blockNumber, blockNumberHex, time_stamp, fromAddress, toAddress, value], (err, result) => {
-        //console.log(result)
+        if(err) {
+          console.log("[DB Fail] ", err.message)
+        }
       })
-      //console.log("===== ", blockNumber, i , "번째 TX DATA DB저장 완료 =====")
     }
   } else {
     console.log("no transaction")
