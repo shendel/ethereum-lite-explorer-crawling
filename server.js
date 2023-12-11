@@ -6,14 +6,25 @@ const { rpcRecheckBlockNum } = require('./rpcRecheckBlockNum')
 
 require('dotenv').config()
 
+let rpcCheckBlockNumError = false
 // forever
-setInterval(() => rpcCheckBlockNum(), 2000) // Checking latest block data every 2 seconds
+setInterval(() => {
+  rpcCheckBlockNum().then((isOk) => {
+    rpcCheckBlockNumError = false
+  }).catch((notOk) => {
+    rpcCheckBlockNumError = true
+  })
+}, 2000) // Checking latest block data every 2 seconds
+
 setInterval(() => rpcRecheckBlockNum() , 60000) // Checking 30 previous block data every minute
 
 app.get("/", (req, res) =>{
-    res.json("crawling server")
+    res.json({
+      Type: "RPC Crawling server",
+      CheckBlockNumError: rpcCheckBlockNumError,
+    })
 })
 
 app.listen(port, () => {
-    console.log(`Example app listening at ${port}`);
+  console.log(`RPC Crawl server started at ${port}`);
 })
