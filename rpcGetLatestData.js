@@ -8,7 +8,7 @@ const rpcGetLatestData = (blockNumber) => {
 const eth_getBlockByNumber = async(blockNumber) => {
   let hex = blockNumber.toString(16)
 
-  const response = await etherApi.post('/', {
+  const response = await etherApi({
       "jsonrpc":"2.0",
       "method":"eth_getBlockByNumber",
       "params":["0x" + hex, true],
@@ -58,7 +58,7 @@ const db_insertTxsData = async(blockTxArr, time_stamp) => {
 
 
       if(blockTxArr[i].to === null){
-        const response = await etherApi.post('/', {
+        const response = await etherApi({
           "jsonrpc":"2.0",
           "method":"eth_getTransactionReceipt",
           "params":[blockTxArr[i].hash],

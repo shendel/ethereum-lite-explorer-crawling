@@ -1,10 +1,23 @@
+require('dotenv').config()
+
 const axios = require("axios");
 
-const etherApi = axios.create({
-    //baseURL : "https://eth.public-rpc.com",
-    baseURL: "http://192.168.56.200:8545/",
-    //baseURL : "https://testnet-rpc-seoul.gen.foundation",
-    headers : {'content-type' : "application/json"}
+const etherApiResp = axios.create({
+  baseURL: process.env.RPC,
+  headers : {'content-type' : "application/json"}
 })
 
-module.exports = { etherApi } 
+const etherApi = (options) => {
+  return new Promise((resolve) => {
+    const doResponse = () => {
+      etherApiResp.post('/', options).then((answer) => {
+        resolve(answer)
+      }).catch((err) => {
+        console.log('[Json RPC Fail]', err.message)
+        setTimeout(doResponse, 5000)
+      })
+    }
+    doResponse()
+  })
+}
+module.exports = { etherApi }
