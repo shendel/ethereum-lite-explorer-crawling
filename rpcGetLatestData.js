@@ -1,5 +1,6 @@
 const { db } = require('./db')
 const { etherApi } = require('./etherApi')
+const { SHA3 } = require('sha3')
 
 const rpcGetLatestData = (blockNumber) => {
   eth_getBlockByNumber(blockNumber)
@@ -63,10 +64,26 @@ const db_insertTxsData = async(blockTxArr, time_stamp) => {
           "params":[blockTxArr[i].hash],
           "id":9
         })
-        toAddress = response.data.result.contractAddress
 
-        const contractDataInsert = "INSERT INTO contract_data (blockNumber, contractAddress) VALUES (?, ?);"
-        db.query(contractDataInsert, [blockNumber, toAddress], (err, result) => {
+        toAddress = response.data.result.contractAddress
+        const contractByteCode = await etherApi({
+          "jsonrpc":"2.0",
+          "method":"eth_getCode",
+          "params":[toAddress, "latest"],
+          "id": 1
+        })
+        const byteCode = contractByteCode.data.result
+        const hash = new SHA3(256);
+
+        
+        const contractDataInsert = 
+          "INSERT INTO contract_data " +
+          "(blockNumber, contractAddress, sha3) VALUES "+
+          "(?,            ?,              ?);"
+        const dbArgs = [
+          blockNumber,    toAddress,      hash.digest('hex')
+        ]
+        db.query(contractDataInsert, dbArgs, (err, result) => {
           if(err) {
             console.log("[DB Fail] ", err.message)
           }    
